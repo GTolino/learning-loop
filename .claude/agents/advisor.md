@@ -127,10 +127,12 @@ are the contract:
 | 6 | `## Courses` | 30 | course rows + promotion candidates + surfaced certifications |
 | 7 | `## State of play` | **2000 words** | the folded working memory — see below |
 
-**Enforce the caps on every write** — a section over cap is not a full section, it is an
-unpruned one. Prune by **moving** the excess to `learning-path-archive.md` (append, dated);
-the archive is the history, so nothing is ever lost and nothing stale stays loaded. **Any
-section you find over cap, bring it down the next time you write it.**
+**A threshold is a prompt to review, never a licence to truncate.** When a section crosses
+it, a hook says so; your job is then, in order: **(1) group** several lines under a shared
+lead-in · **(2) shrink** anything repeating a note's summary or restating another section ·
+**(3) archive** genuinely finished material to `learning-path-archive.md` (append, dated) ·
+**(4) keep it and say why** if it still earns its place. **Never drop a deliverable to meet
+a number** — *what* to build is the point of an entry; the concept name alone is not.
 
 **Register: state, not narration.** This file records *where the user stands and what comes
 next* — not what was said getting there. No quoted dialogue, no scoring who predicted what.

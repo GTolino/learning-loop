@@ -2,9 +2,10 @@
 # PostToolUse hook (Write|Edit): enforce the size contract on the two state files
 # that otherwise grow forever — learning-path.md and _understanding-log.md.
 #
-# Caps live in .claude/agents/advisor.md; this hook is the deterministic half.
-# It never blocks a write — it reports the violation back so the agent that just
-# made it fixes it now, instead of leaving it for a cleanup that never comes.
+# Thresholds live in .claude/agents/advisor.md. These are REVIEW PROMPTS, not hard
+# limits: the hook never blocks a write, it just makes growth visible at the moment
+# it happens so it gets grouped, shrunk or archived deliberately — or kept on
+# purpose. A section may legitimately sit over threshold.
 
 VAULT="${CLAUDE_PROJECT_DIR:-$PWD}/notes"
 
@@ -32,13 +33,13 @@ if [ "$FILE" = "$VAULT/learning-path.md" ]; then
       if(sec!="") lines[sec]=n
       for(s in lines) for(c in cap)
         if(index(s,c)==1 && lines[s]>cap[c])
-          printf "  %s — %d lines (cap %d)\n", c, lines[s], cap[c]
+          printf "  %s — %d lines (threshold %d)\n", c, lines[s], cap[c]
     }' "$FILE")
 
   WORDS=$(awk '/^## State of play/{f=1;next} /^## /{f=0} f' "$FILE" | wc -w | tr -d ' ')
   if [ "${WORDS:-0}" -gt 2200 ]; then
     OUT="${OUT}
-  ## State of play — ${WORDS} words (budget 2000). Fold harder before archiving."
+  ## State of play — ${WORDS} words (budget 2000) — fold harder before archiving."
   fi
 else
   # understanding log: rows are pointers, not narratives. The concept lives in
@@ -54,6 +55,6 @@ fi
 [ -z "$OUT" ] && exit 0
 
 cat <<EOF
-{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"⚠ Size contract violated in $(basename "$FILE") — fix it in this turn, do not defer:\n$(printf '%s' "$OUT" | python3 -c 'import sys,json;print(json.dumps(sys.stdin.read())[1:-1])')\nPrune by MOVING the excess to the matching *-archive.md (append, dated) — never delete."}}
+{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"📏 Over review threshold in $(basename "$FILE") — review now, do not defer:\n$(printf '%s' "$OUT" | python3 -c 'import sys,json;print(json.dumps(sys.stdin.read())[1:-1])')\nTry in order: GROUP related lines · SHRINK anything repeating a note summary or another section · ARCHIVE finished material (append, dated) · or KEEP it and say why. Never drop a deliverable to hit a number."}}
 EOF
 exit 0
