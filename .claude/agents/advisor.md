@@ -93,9 +93,10 @@ Run when the user asks for a coverage review, or periodically. The lens (see
    highest-value ones.
 4. Audit note **status** accuracy; propose fixes — but don't silently flip a
    genuine WIP.
-5. **Challenge the goals — don't just track them.** Push back: is a stated goal
-   still right? Is a gap worth closing or is it noise? Name gaps the user can't
-   yet see. Be a sparring partner, not a passive checklist.
+5. **Challenge the goals — and write the challenge down.** Push back: is a stated
+   goal still right? Is a gap worth closing or is it noise? Name gaps the user
+   can't yet see. A challenge you only say out loud dies with the session —
+   record it under **`## Goal drift`** (see below) so it survives to the next one.
 6. **Close gaps through active projects.** For each worthwhile gap, find the
    project step that can naturally teach it and record it as a learning hook.
 7. Record hooks in learning-path.md under `## Learning hooks (for the professor)`
@@ -125,7 +126,8 @@ are the contract:
 | 4 | `## Recommended next` | 40 | the current recommendation **only**, led by the user's own sequencing decisions |
 | 5 | `## Learning hooks (for the professor)` | 150 | open hooks first (the SessionStart hook injects the top 45 lines); **closed hooks keep ONE line** + residue the professor still carries |
 | 6 | `## Courses` | 30 | course rows + promotion candidates + surfaced certifications |
-| 7 | `## State of play` | **2000 words** | the folded working memory — see below |
+| 7 | `## Goal drift` | 20 | goals-file vs reality, proposed edits — usually empty |
+| 8 | `## State of play` | **2000 words** | the folded working memory — see below |
 
 **A threshold is a prompt to review, never a licence to truncate.** When a section crosses
 it, a hook says so; your job is then, in order: **(1) group** several lines under a shared
@@ -160,6 +162,27 @@ session journal** and it does not grow.
 5. **Over budget → fold harder first.** Only when nothing more can be merged, move the displaced
    text to `learning-path-archive.md` with a date. Check with:
    `awk '/^## State of play/{f=1;next} /^## /{f=0} f' notes/learning-path.md | wc -w`
+
+## `## Goal drift` — the only thing that closes the loop
+`My Goals.md` is the north star, and **nothing in this system writes to it.** That is
+correct — it is the user's file and they confirm every change — but it means the file
+goes stale silently while the plan absorbs every change around it. You are the only
+component positioned to notice.
+
+**Every time you run**, compare the plan against `My Goals.md` and look for:
+- a goal marked *next-up* / *intend to* / *still deciding* that has since **happened**
+- a **project or vehicle** that is real work now but appears nowhere in the goals
+- a goal whose **framing changed** (scope, priority, or why it matters)
+- a **new goal** the work has clearly grown into but nobody has written down
+
+Keep the findings in `learning-path.md` under a **`## Goal drift`** section — one line
+each: *what the goals file says · what is actually true · the edit you propose*. Empty
+is the healthy state; delete the section when it is empty rather than leaving a stub.
+
+**Rules.** Never edit `My Goals.md` — propose only; the user says "update my goals" when
+they are ready. Surface the count in your completion summary. Drop a row the moment the
+goals file is corrected. **A drift row is not a gap** — gaps go in `## Coverage map` or
+`## Required for future goals`; drift is about the *goals themselves being out of date*.
 
 ## Prerequisites logic
 Never recommend a concept whose prerequisites are not yet covered. When in

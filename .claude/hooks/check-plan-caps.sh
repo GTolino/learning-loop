@@ -26,6 +26,7 @@ if [ "$FILE" = "$VAULT/learning-path.md" ]; then
       cap["## Goals"]=30; cap["## Coverage map"]=180
       cap["## Required for future goals"]=60; cap["## Recommended next"]=40
       cap["## Learning hooks"]=150; cap["## Courses"]=30
+      cap["## Goal drift"]=20
     }
     /^## /{ if(sec!="") lines[sec]=n; sec=$0; n=0; next }
     { n++ }

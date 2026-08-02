@@ -36,7 +36,15 @@ if [ -f "$LP" ]; then
   echo "### Recommended next — from learning-path.md"
   awk '/^## Recommended next/{f=1;next} /^## /{f=0} f' "$LP" | head -35
   echo
-  echo "### Learning hooks — weave in when the project step arrives"
+  DRIFT=$(awk '/^## Goal drift/{f=1;next} /^## /{f=0} f' "$LP" | grep -v '^[[:space:]]*$')
+  if [ -n "$DRIFT" ]; then
+    echo "### ⚠ Goal drift — \`My Goals.md\` disagrees with the plan"
+    printf '%s\n' "$DRIFT"
+    echo
+    echo "_Say **\"update my goals\"** to review these. Nothing edits that file without you._"
+    echo
+  fi
+echo "### Learning hooks — weave in when the project step arrives"
   # Cut at a hook boundary, never mid-sentence.
   awk '/^## Learning hooks/{f=1;next} /^## /{f=0} f' "$LP" \
     | awk 'BEGIN{n=0} /^[0-9]+\. /{if(n>50) exit} {print; n++}'
