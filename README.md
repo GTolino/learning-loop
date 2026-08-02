@@ -42,6 +42,11 @@ willpower.
 - **Point-of-use review.** For ops/procedural topics the quiz is deferred to the moment
   you next *deploy* the thing — logged with a trigger so it actually resurfaces. The
   note is still written now, as a runbook you can follow unaided.
+- **The roadmap can't bloat.** `learning-path.md` answers three questions — what's covered,
+  how it connects to a goal, what's missing that a goal needs — under per-section line caps
+  a hook enforces on every write. Its `## State of play` is a fixed ~2000-word working memory
+  the advisor *folds* new information into rather than appending to, so the plan stays a map
+  instead of decaying into a journal. Displaced text moves to an archive; nothing is deleted.
 - **Atomic vault, metadata-first.** One concept per file, filename = concept name,
   one-line `summary` in frontmatter as the retrieval payload. Agents scan the
   generated `INDEX.md`, not 300 notes. Plain Markdown, Obsidian-compatible, no
@@ -84,6 +89,7 @@ CLAUDE.md                  Claude Code wiring — spokes, skills, agents, hooks
   agents/                  scribe (writes notes) · advisor (keeps the roadmap) · enricher (fact-checks)
   skills/                  setup · add-to-notes · review · harvest · enrich-notes · new-course
   hooks/                   learning-dashboard.sh (SessionStart) · regen-index.sh (auto-INDEX)
+                           check-plan-caps.sh (enforces the roadmap/log size contract)
   templates/               canonical Course Tutor file (copied into each course folder)
 notes/                     your vault — atomic notes, INDEX.md, learning-path.md, understanding log
 ```

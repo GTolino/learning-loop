@@ -45,8 +45,8 @@ you'll change:
 grep -n '^## ' notes/learning-path.md      # section map + line numbers
 ```
 Then `Read` with `offset`/`limit` for those sections only. A routine
-note-capture update touches `## Tracks`, `## Session log` and
-`## Recommended next` — it does not need the other seven. Never overwrite
+note-capture update touches `## Coverage map`, `## State of play` and
+`## Recommended next` — it does not need the other four. Never overwrite
 existing progress — only update and expand. **Never read
 `learning-path-archive.md`** unless the user asks about history.
 
@@ -112,33 +112,52 @@ lands (INDEX is the proof). When the `new-course` skill reports a new course,
 add its row and connect it to goals.
 
 ## learning-path.md structure
-Keep it an index, not a textbook. Section headings are **load-bearing** — the
-SessionStart hook and the `review` skill `awk`/`grep` on them. Never rename one.
-The caps are the contract:
+The file answers three questions and nothing else: **what is covered, how it connects to a
+goal, and what is missing that a goal needs.** Section headings are **load-bearing** — the
+SessionStart hook and the `review` skill `awk`/`grep` on them. Never rename one. The caps
+are the contract:
 
-| # | Section | Cap | Content |
+| # | Section | Cap | Answers |
 |---|---|---|---|
-| 1 | `## Goals summary` | 40 | derived from My Goals.md |
-| 2 | `## Current focus & sequencing` | 60 | the active lane(s), set by the user |
-| 3 | `## Recommended next` | 60 | options presented; the user leads |
-| 4 | `## Tracks` | 80 | per-track checklists; checked only if a note exists |
-| 5 | `## Courses` | 30 | course rows + promotion candidates |
-| 6 | `## Readiness summary` | 30 | table per track |
-| 7 | `## Gaps — to-cover` | 60 | genuine never-written gaps |
-| 8 | `## Learning hooks (for the professor)` | 150 | open hooks first (the SessionStart hook injects the top 45 lines); **closed hooks keep ONE line** + any residue the professor must still carry |
-| 9 | `## Session log` | 100 | newest first, last ~5 sessions, **≤20 lines each** |
-| 10 | `## Certifications and courses` | 20 | surfaced options with sources |
+| 1 | `## Goals` | 30 | the goals, each with a stable ID (`G1`…), from My Goals.md |
+| 2 | `## Coverage map` | 150 | **per goal: covered (note links) · open · blocked.** The single source for coverage — never split it back into tracks/gaps/readiness |
+| 3 | `## Required for future goals` | 60 | not covered, and a **not-yet-started** goal depends on it — ordered by prerequisite |
+| 4 | `## Recommended next` | 40 | the current recommendation **only**, led by the user's own sequencing decisions |
+| 5 | `## Learning hooks (for the professor)` | 150 | open hooks first (the SessionStart hook injects the top 45 lines); **closed hooks keep ONE line** + residue the professor still carries |
+| 6 | `## Courses` | 30 | course rows + promotion candidates + surfaced certifications |
+| 7 | `## State of play` | **2000 words** | the folded working memory — see below |
 
-**Enforce the caps on every write** — a section over cap is not a full section,
-it is an unpruned one. Prune by **moving** the excess to
-`learning-path-archive.md` (append, dated); the archive is the history, so
-nothing is ever lost and nothing stale stays loaded. **Any section you find over
-cap, bring it down the next time you write it.**
+**Enforce the caps on every write** — a section over cap is not a full section, it is an
+unpruned one. Prune by **moving** the excess to `learning-path-archive.md` (append, dated);
+the archive is the history, so nothing is ever lost and nothing stale stays loaded. **Any
+section you find over cap, bring it down the next time you write it.**
 
-**Register: state, not narration.** This file records *where the user stands and
-what comes next* — not what was said getting there. No quoted dialogue, no
-scoring who predicted what. A row earns its place by changing a decision.
-Same rule the notes follow: content, not transcript.
+**Register: state, not narration.** This file records *where the user stands and what comes
+next* — not what was said getting there. No quoted dialogue, no scoring who predicted what.
+A line earns its place by changing a decision. Same rule the notes follow.
+
+**Never repeat a note's summary here.** The summary is in `INDEX.md`; a coverage line is
+`- [x] Concept → path/to/note.md` and nothing more.
+
+### `## State of play` — a folded summary, not a log
+A **fixed ~2000-word working memory** of everything still live: decisions that still bind,
+blockers and their status, unverified loose ends, what changed about the plan. It is **not a
+session journal** and it does not grow.
+
+1. **Fold, never append.** Read the whole section, then integrate the new information into the
+   sentences that already cover those things. A fact that settles an open question **replaces**
+   the uncertainty it resolved — it does not get added beneath it.
+2. **Drop by irrelevance, never by age.** A decision from months ago that still governs the work
+   stays. Last session's dead end goes. **Never FIFO** — never push 200 words onto the top and
+   cut 200 from the bottom.
+3. **A session that changed nothing changes nothing here.** Concept review, curiosity sidesteps,
+   ops with no new state → leave the section untouched and say so. Silence is a valid update.
+4. **Earns space:** decisions that still bind · open blockers · unverified loose ends · what
+   changed about the plan. **Doesn't:** what was explained, quiz outcomes (those belong in
+   `_understanding-log.md`), or how a conclusion was reached.
+5. **Over budget → fold harder first.** Only when nothing more can be merged, move the displaced
+   text to `learning-path-archive.md` with a date. Check with:
+   `awk '/^## State of play/{f=1;next} /^## /{f=0} f' notes/learning-path.md | wc -w`
 
 ## Prerequisites logic
 Never recommend a concept whose prerequisites are not yet covered. When in

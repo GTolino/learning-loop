@@ -17,9 +17,11 @@ not a new work phase.
    - **Half-landed** — covered but wobbly, or interrupted.
    - **Ops/procedural** — done hands-on; per the point-of-use preference the
      review belongs at deployment time, not now.
-   - **Passing mention** — touched, but serves no active goal and the user would
-     never re-read it. **No note, no log row.** This is the goal-relevance filter
-     from `AGENTS.md`; say so in the table so the user can override.
+   - **Probably not worth capturing** — touched in passing, and you judge the user
+     would never re-read it. **A proposal, never a decision:** put it in the table
+     with that suggestion and let the user say. Never judge by whether it serves a
+     *current* goal — goals retire, and the note answering a retired question is
+     often the one that pays off later.
 
 2. **Present the harvest table** (concept · class · suggested action). Keep it
    scannable — a checklist, not a summary essay.
@@ -44,8 +46,8 @@ not a new work phase.
 
 ## Rules
 
-- **Never pressure.** Suggest; the user decides what gets captured. Skipped
-  concepts simply don't appear in any log.
+- **Never pressure, and never decide.** You classify and suggest; **the user alone
+  decides what gets captured.** Skipped concepts simply don't appear in any log.
 - Don't re-teach during harvest — if something needs re-explaining it's
   half-landed by definition: capture it as `wip` and log it.
 - ⚠ **A log row must never point at a note that doesn't contain the concept.**

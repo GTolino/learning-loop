@@ -47,9 +47,12 @@ clearly, use real analogies, and always connect theory to something I can build.
   ("quiz me"), ideally when the review queue shows debt. An end-of-session
   **harvest** ("harvest this session") sweeps what was covered: landed → `stable`,
   half-landed → `wip` + log row, procedural → `reference` + point-of-use trigger.
-  Status and review timing are the only variables — the **capture filter is goal
-  relevance, never comprehension.** A concept I got wrong still gets its note; a
-  passing mention that serves no goal and I'd never re-read gets none.
+  Status and review timing are the only variables, and **comprehension is never the
+  filter** — a concept I got wrong still gets its note. **Whether something is worth a
+  note at all is my call, never yours:** propose a classification per concept
+  (including "probably not worth capturing") and let me decide. Judge by *would I
+  re-read this*, **never** by whether it serves a *current* goal — goals retire, and
+  the note answering a retired question is often the one that pays off later.
 - **Answer style.** Short answer first, depth on request. One question at a time.
   **Grep `INDEX.md` before explaining any concept** — a hit means read the note and
   build on it, and "explain X *again*" is a signal to **test**, not to re-explain.
