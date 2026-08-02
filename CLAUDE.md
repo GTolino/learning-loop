@@ -10,7 +10,9 @@
 - **Durable preferences + ways of working** → `AGENTS.md`
 - **Knowledge** → the vault `notes/` (atomic notes + generated `INDEX.md`)
 - **Roadmap + coverage** → `notes/learning-path.md` (advisor-maintained)
-- **Retention layer** → `_understanding-log.md` (vault root + per course folder)
+- **Retention layer** → **each note's own frontmatter** (`status:` / `review:`). The
+  review queue is *generated* into `notes/INDEX.md` — nothing is maintained by hand, so
+  it cannot drift from the notes. Course folders keep their own `_understanding-log.md`.
 
 ## Spokes
 This workspace is a hub. Each **course folder** under `notes/` has its own
@@ -32,7 +34,7 @@ only the notes you need.
 |---|---|---|
 | "set up my learning environment" | Hub | `setup`: one-time bootstrap interview |
 | "add to my notes" | Hub | `add-to-notes`: comprehension check (🟡/❌ → understanding log) → **scribe** writes the atomic note → **advisor** updates the path |
-| "quiz me (on X)" | Hub | `review`: retention quiz over vault notes + log re-tests |
+| "quiz me (on X)" | Hub | `review`: retention quiz over vault notes + whatever the generated queue says is due; a pass flips the note `wip` → `stable` |
 | "harvest this session" / "wrap up" | Hub | `harvest`: end-of-session sweep |
 | "enrich my notes (on X)" / "fill my gaps" | Hub or spoke | `enrich-notes`: **enricher**, log-first rule |
 | "start a course" | Hub | `new-course`: scaffold a course spoke + register with the **advisor** |
@@ -51,14 +53,24 @@ only the notes you need.
   "what should I study next?", after `My Goals.md` changes, and when a course is
   added. Applies the **force-learning** lens to projects AND courses.
 - **enricher** (`.claude/agents/enricher.md`) — fact-checks + appends verified
-  resources; works `_understanding-log.md` open gaps first (log-first rule).
+  resources; works open gaps first (log-first rule) — the generated `## Review queue`
+  at the hub, a course folder's own `_understanding-log.md` in a spoke.
 
 ## Hooks (`.claude/settings.json` → `.claude/hooks/`)
 - **SessionStart** (`learning-dashboard.sh`) — injects the learning dashboard at
   hub session start; inside a course spoke shows that course's open gaps instead.
+  **Injects every section whole — it never truncates.** Course spokes reach it via
+  their own `.claude/settings.json` (from `.claude/templates/course-settings.json`),
+  because settings load from the folder Claude Code is launched in and the repo
+  root's never apply there — a spoke without that file gets no hook at all, silently.
 - **PostToolUse** on Write|Edit (`regen-index.sh`) — auto-regenerates
-  `notes/INDEX.md` whenever a vault note is written. Nobody regenerates the index
-  by hand (manual fallback: `python3 generate_index.py` from `notes/`).
+  `notes/INDEX.md` whenever a vault note is written, and surfaces anything the
+  generator reports about the note just written (missing summary or status).
+  Manual fallback: `python3 generate_index.py` from `notes/`.
+- **PostToolUse** on Write|Edit (`state-file-review.sh`) — section-size review for
+  `notes/learning-path.md`, the one state file still grown by hand (thresholds shared
+  with the dashboard via `thresholds.sh`). Never blocks a write; it is a prompt to
+  group, shrink or archive now, while the context is live.
 
 ## Updating goals
 When the user says "update my goals": read `notes/My Goals.md`, propose edits in

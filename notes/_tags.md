@@ -16,3 +16,18 @@
 
 > Setup adds your topic tags (e.g. `networking`, `python`, `ml`) during the
 > bootstrap interview.
+
+## `status:` values (frontmatter)
+
+- `stable` — comprehension verified; **terminal**, never goes back to `wip`
+- `wip` — written, not yet verified (**this is what puts a note in the review queue**)
+- `reference` — procedure/runbook, review deferred to point of use
+- `project` — project state / planning
+- `complete` — a finished body of work (e.g. a closed-out course note)
+
+## `review:` (frontmatter, optional)
+
+> A point-of-use moment — `review: when deploying X`. Independent of `status`: a
+> `stable` note may still carry one. Absent = nothing deferred. Delete the line once
+> the moment has passed. `status` and `review` together generate the review queue in
+> `INDEX.md`; there is no separate log to maintain.

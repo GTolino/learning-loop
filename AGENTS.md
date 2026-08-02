@@ -35,18 +35,36 @@ clearly, use real analogies, and always connect theory to something I can build.
   `status: wip`, and that note must state **the misconception, why it's wrong, and
   what would settle it** — written as a wrong model anyone could hold, **never as a
   record of who said what, or when**. Understanding is demonstrated by **reading real
-  output correctly**, not only by predicting it in advance. Either way the wobble gets
-  a row in `_understanding-log.md` — the review queue's input, never discarded.
-  ⚠ **A log row must never point at a note that doesn't contain the concept.**
+  output correctly**, not only by predicting it in advance. "Quiz me" re-tests what is
+  due; **passing flips `wip` → `stable`**.
+  ⚠ **The note is the only carrier of review state — there is no second file.** Leaving
+  a concept `wip` IS queuing it. If there is no note, there is nothing to queue: write it.
+- **`wip` means worth DEEPENING — not every wobble.** The queue is a list of
+  understanding worth going further on, not a bug tracker of everything I got wrong.
+  Leave a note `wip` only if closing it would **change how I reason about the concept as
+  a class** — *would this change how I approach the next instance of this kind of thing?*
+  If the wobble was a lookup detail (a flag name, a path, which column of an output),
+  write it **into the note** and mark the note `stable`.
+  - **Asking for clarification is not a miss.** A question I ask mid-explanation is how
+    learning works — it never makes a note `wip`.
+  - **`stable` is terminal.** Once a note is `stable` it never goes back to `wip`.
+    Re-covering that concept is **review, not debt**; what a re-encounter produces is a
+    **better note**.
+  - This governs the **status**, never the **note**. A concept I got wrong still gets
+    its note, always.
 - **Point-of-use review for ops/procedural topics.** Don't quiz right after a
   procedure. **Deferring the quiz never defers the note:** capture it as
   `status: reference` — a runbook I can follow again unaided (exact commands, why each
-  step exists, what breaks if it's skipped) — and log the deferred review with a
-  trigger (e.g. `when deploying X`) so it resurfaces at the right moment.
+  step exists, what breaks if it's skipped) — and give it a **`review:` trigger** in its
+  frontmatter (e.g. `review: when deploying X`) so it resurfaces at the right moment.
+  `review:` is **independent of `status`**: a `stable` note can still say *revisit me
+  when you next touch X*. That is an application moment, not comprehension debt. Delete
+  the line once the moment has passed.
 - **Retention is a loop, not a capture.** Review is pull-based active recall
   ("quiz me"), ideally when the review queue shows debt. An end-of-session
   **harvest** ("harvest this session") sweeps what was covered: landed → `stable`,
-  half-landed → `wip` + log row, procedural → `reference` + point-of-use trigger.
+  half-landed → `wip`, procedural → `reference` + a `review:` trigger,
+  **already-`stable` → enrich the existing note** (that's review, not debt).
   Status and review timing are the only variables, and **comprehension is never the
   filter** — a concept I got wrong still gets its note. **Whether something is worth a
   note at all is my call, never yours:** propose a classification per concept
@@ -103,17 +121,25 @@ durable concept with a source link back.
   re-teach me the concept, it isn't finished. Prefer the sharp falsifying example
   over a complete survey.
 - **Frontmatter schema (every note):** `title · topic · tags · created · summary ·
-  related · status`. `summary` is the one-line retrieval payload. `tags` come
-  **only** from the controlled registry in `notes/_tags.md`.
+  related · status` — plus `review` when the review is deferred. `summary` is the
+  retrieval payload; write it as long as the concept needs, since `INDEX.md` clips it
+  when it emits the map. `tags` come **only** from the controlled registry in
+  `notes/_tags.md`.
   `status`: **stable** (comprehension verified) · **wip** (written, not yet verified —
-  carries the open question and the misconception) · **reference** (procedure/runbook,
-  review deferred to point of use) · **project** · **complete**.
-- **`INDEX.md`** = generated map of all notes by topic + a **Gaps** section
-  (concepts linked but never written). Regenerated automatically by a hook.
-- **Retention layer:** `_understanding-log.md` files — one at the vault root and
-  one per course folder — record quiz misses, half-landed concepts, and deferred
-  point-of-use reviews. "Quiz me" re-tests them; "fill my gaps" writes the answers
-  into the notes. Resolved entries are never deleted.
+  carries the open question and the misconception; **this is what queues it**) ·
+  **reference** (procedure/runbook, review deferred to point of use) · **project** ·
+  **complete**.
+  `review`: a point-of-use moment (`review: when deploying X`), independent of status.
+  Absent = nothing deferred.
+- **`INDEX.md`** = generated map of all notes by topic (each with its `status`), plus
+  the generated **Review queue** and a **Gaps** section (concepts linked but never
+  written). Regenerated automatically by a hook — never edit it by hand.
+- **Retention layer: the note carries its own review state.** `status` says whether the
+  concept is verified; `review` defers it to a moment. The **review queue is generated**
+  into `INDEX.md` from those two fields — nothing is maintained by hand, so a queue entry
+  can never point at a note that doesn't hold the concept. "Quiz me" re-tests what is due
+  and promotes on a pass; "fill my gaps" writes answers into the notes but does *not*
+  promote. Course folders keep their own `_understanding-log.md` and conventions.
 - **Retrieval = metadata-first:** scan summaries/tags in INDEX, read only the
   relevant note. No lock-in; a local model can read the vault offline.
 - **Course folders keep their own conventions** — module notes, assignments,

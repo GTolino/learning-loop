@@ -5,6 +5,12 @@ Scans the hub topic folders, parses each note's YAML frontmatter, and emits a
 rolled-up map grouped by topic (Map-of-Content hubs first, then the rest), plus
 a Gaps section listing concepts referenced via [[wikilinks]] that have no note.
 
+Also emits the REVIEW QUEUE, derived from each note's `status` and `review`
+fields. The note is the only carrier of review state — there is no second file
+to keep in sync, so a queue entry can never point at a note that doesn't hold
+the concept. `status: wip` is due now; a `review:` value defers to a moment;
+`stable` is terminal. The SessionStart hook injects that section.
+
 Topic folders are AUTO-DISCOVERED: any top-level directory that is not hidden,
 not underscore-prefixed, and not a spoke (spokes — e.g. course folders — carry
 their own CLAUDE.md) is indexed. TOPIC_ORDER only sets display order; new
@@ -84,6 +90,20 @@ def parse_list(s: str) -> list[str]:
     return [unquote(s)] if s else []
 
 
+# INDEX is a SCANNING map, not a substitute for the notes. Notes carry whatever
+# summary they need; the index clips at emit time so the map stays cheap to scan.
+# The agent reads a clipped line, decides which note is relevant, and opens it for
+# the full text. Never clip anything in a note itself.
+SUMMARY_MAX = 160
+
+
+def clip(s: str, n: int = SUMMARY_MAX) -> str:
+    """Cut to n chars on a word boundary, marking that more lives in the note."""
+    if len(s) <= n:
+        return s
+    return s[:n].rsplit(" ", 1)[0].rstrip(" ,;:—-") + " …"
+
+
 def sort_key(title: str) -> str:
     """Case-insensitive, ignoring leading non-alphanumerics (backticks, /)."""
     return re.sub(r"^[^0-9A-Za-z]+", "", title).lower()
@@ -95,13 +115,24 @@ class Note:
         self.title = unquote(fm.get("title", path.stem))
         self.summary = unquote(fm.get("summary", "")).strip()
         self.aliases = parse_list(fm.get("aliases", ""))
+        # Review state — the note is the ONLY carrier. `status` says whether the
+        # concept is verified; `review` defers it to a moment. Queue membership is
+        # derived from these two, so nothing hand-maintained can drift from them.
+        self.status = unquote(fm.get("status", "")).strip() or "unknown"
+        self.review = unquote(fm.get("review", "")).strip()
+        self.topic = path.parent.name
         s = self.summary.lower()
         self.is_hub = s.startswith("map of content") or s.startswith("map-of-content")
 
+    @property
+    def queued(self) -> bool:
+        """`wip` is due now; any `review:` trigger waits. `stable` is terminal."""
+        return self.status == "wip" or bool(self.review)
+
     def entry(self) -> str:
         marker = "🗺 " if self.is_hub else ""
-        summary = self.summary or "_(no summary)_"
-        return f"- {marker}[[{self.stem}|{self.title}]] — {summary}"
+        summary = clip(self.summary) if self.summary else "_(no summary)_"
+        return f"- {marker}[[{self.stem}|{self.title}]] · `{self.status}` — {summary}"
 
 
 def collect() -> tuple[dict[str, list[Note]], set[str], list[str], list[Path]]:
@@ -152,10 +183,59 @@ def build(topics, known, link_targets) -> str:
         "retrieval\n> and coverage review. Regenerate with `generate_index.py` "
         "after adding notes.\n"
     )
+    counts: dict[str, int] = {}
+    for v in topics.values():
+        for n in v:
+            counts[n.status] = counts.get(n.status, 0) + 1
+    roll = " · ".join(f"{c} {s}" for s, c in sorted(counts.items(), key=lambda kv: -kv[1]))
     out.append(
         f"**{total} hub notes** across {len(topics)} topics. "
         f"{hubs} Map-of-Content hubs.\n"
     )
+    out.append(f"**Status:** {roll}.\n")
+
+    # Review queue — generated, never maintained. This is what the SessionStart
+    # hook injects; it replaced a hand-written _understanding-log.md whose rows
+    # could point at notes that did not hold the concept.
+    due = sorted(
+        (n for v in topics.values() for n in v if n.status == "wip" and not n.review),
+        key=lambda n: sort_key(n.title),
+    )
+    waiting = sorted(
+        (n for v in topics.values() for n in v if n.review),
+        key=lambda n: (n.review.lower(), sort_key(n.title)),
+    )
+    out.append(f"## Review queue ({len(due) + len(waiting)})\n")
+    out.append(
+        "> Derived from frontmatter, not maintained by hand. **`status: wip`** is due "
+        "now —\n> unverified comprehension. **`review:`** is a point-of-use moment and "
+        "is independent\n> of status: a `stable` note can still say *revisit me when "
+        "you next touch X*.\n> A `stable` note with no trigger is never listed — that "
+        "is what terminal means.\n> Closing: flip `wip` → `stable` on a passing "
+        "re-test; drop `review:` once the moment passes.\n"
+    )
+    out.append(f"**Due now ({len(due)})**\n")
+    if due:
+        out.extend(
+            f"- [[{n.stem}|{n.title}]] ({n.topic}) — "
+            f"{clip(n.summary) if n.summary else '_(no summary)_'}"
+            for n in due
+        )
+    else:
+        out.append("_Nothing due._")
+    out.append("")
+    out.append(f"**Waiting on a trigger ({len(waiting)})**\n")
+    if waiting:
+        out.extend(
+            f"- **{n.review}** → [[{n.stem}|{n.title}]] · `{n.status}`" for n in waiting
+        )
+        out.append(
+            "\n_A trigger whose moment has arrived: delete the note's `review:` "
+            "line and it is due._"
+        )
+    else:
+        out.append("_None deferred._")
+    out.append("")
 
     for topic in ordered:
         notes = topics.get(topic)
@@ -200,11 +280,20 @@ def main() -> int:
     hubs = sum(1 for v in topics.values() for n in v if n.is_hub)
     print(f"INDEX.md written: {total} notes, {hubs} hubs, "
           f"{len(topics)} topics.", file=sys.stderr)
-    if skipped:
-        print(f"\n{len(skipped)} .md file(s) skipped (no frontmatter title) — "
-              f"add frontmatter to index them:", file=sys.stderr)
-        for p in skipped:
-            print(f"  - {p.relative_to(VAULT)}", file=sys.stderr)
+    # Per-note problems, reported with the path so a caller can filter to the file
+    # it just wrote. These used to be swallowed by the hook's 2>/dev/null — which is
+    # how a note with no title stayed unindexed for months.
+    for p in skipped:
+        print(f"{p.relative_to(VAULT)}: NO frontmatter title — not indexed at all",
+              file=sys.stderr)
+    for notes in topics.values():
+        for n in notes:
+            if not n.summary:
+                print(f"{n.topic}/{n.stem}.md: no summary — the retrieval payload "
+                      f"INDEX is built from", file=sys.stderr)
+            if n.status == "unknown":
+                print(f"{n.topic}/{n.stem}.md: no status — it cannot enter or leave "
+                      f"the review queue", file=sys.stderr)
     return 0
 
 

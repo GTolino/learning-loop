@@ -1,0 +1,16 @@
+{
+  "_comment": "Copied into every course spoke as <spoke>/.claude/settings.json. Settings load from the folder Claude Code is launched in, so the repo-root settings never apply inside a spoke — without this file a course folder gets no SessionStart hook at all, silently. CLAUDE_PROJECT_DIR is the SPOKE here, so the path walks up to the repo root.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/../../.claude/hooks/learning-dashboard.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}
