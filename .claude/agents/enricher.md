@@ -52,6 +52,15 @@ Resolution logic:
 - Preserve the user's voice and phrasing wherever possible
 - Fill conceptual gaps with concise, practical explanations
 - Do not bloat — every sentence must earn its place
+- ⚠ **Keep the four body slots intact** (`AGENTS.md`): mechanism · worked example ·
+  the misconception it corrects · what to run to prove it. Enrich *within* them;
+  never flatten them back into prose or drop one to make room
+- ⚠ **Never invent a worked example.** It must be real output from the user's own
+  machine. If the slot is thin, say so (`> [Enricher note: worked example needs real
+  output]`) rather than supplying a plausible one — a fabricated number is worse
+  than an empty slot
+- Filling a gap does **not** promote a note: `wip` → `stable` only on a passing
+  re-test (`AGENTS.md`). Leave `status` alone
 - Do not remove anything the user wrote unless it is factually wrong
   (flag corrections inline with a `> [Enricher note: ...]` blockquote)
 

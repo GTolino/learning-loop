@@ -37,17 +37,28 @@ if [ -f "$LP" ]; then
   awk '/^## Recommended next/{f=1;next} /^## /{f=0} f' "$LP" | head -35
   echo
   echo "### Learning hooks — weave in when the project step arrives"
-  awk '/^## Learning hooks/{f=1;next} /^## /{f=0} f' "$LP" | head -45
+  # Cut at a hook boundary, never mid-sentence.
+  awk '/^## Learning hooks/{f=1;next} /^## /{f=0} f' "$LP" \
+    | awk 'BEGIN{n=0} /^[0-9]+\. /{if(n>50) exit} {print; n++}'
   echo
 else
   echo "_No learning-path.md yet — say **\"set up my learning environment\"** to bootstrap._"
   echo
 fi
 if [ -f "$VAULT/_understanding-log.md" ]; then
-  OPEN=$(awk '/^## Open gaps/{f=1;next} /^## /{f=0} f' "$VAULT/_understanding-log.md" | grep -c '^| [0-9]')
+  ROWS=$(awk '/^## Open gaps/{f=1;next} /^## /{f=0} f' "$VAULT/_understanding-log.md" | grep '^| [0-9]')
+  OPEN=$(printf '%s\n' "$ROWS" | grep -c '^| [0-9]')
   echo "### Vault review queue — _understanding-log.md ($OPEN open)"
   if [ "$OPEN" -gt 0 ]; then
-    awk '/^## Open gaps/{f=1;next} /^## /{f=0} f' "$VAULT/_understanding-log.md" | grep '^| [0-9]' | head -10
+    # Overdue first: a point-of-use trigger whose moment already passed is not
+    # future work, it is debt that silently stopped resurfacing.
+    OVERDUE=$(printf '%s\n' "$ROWS" | grep '⏰')
+    if [ -n "$OVERDUE" ]; then
+      echo "**⏰ Triggers that already fired — overdue:**"
+      printf '%s\n' "$OVERDUE"
+      echo
+    fi
+    printf '%s\n' "$ROWS" | grep -v '⏰' | head -8
   else
     echo "_Empty — nothing due._"
   fi

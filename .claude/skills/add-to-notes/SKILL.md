@@ -29,10 +29,14 @@ mid-explanation. The user decides when something is ready.
      the concept** — that is the failure this step prevents.
 
 1. **Invoke the scribe subagent** (Agent tool, `subagent_type: scribe`).
-   Do **not** summarize the concept first — pass the raw context:
-   - The topic or concept just covered
-   - A clear summary of what was explained
-   - Key commands, terms, or tools mentioned
+   Do **not** summarize the concept first — pass the raw context. The scribe is
+   forbidden from inventing a worked example, so it can only write one if **you
+   hand it the real material**:
+   - The topic or concept just covered, and the mechanism as explained
+   - ⚠ **The actual commands run and the actual output they printed**, verbatim
+     from this session — this is the note's worked example and cannot be
+     reconstructed later
+   - The misconception, if the check surfaced one (stated impersonally)
    - What it connects to from existing notes
 2. **Relay the scribe's result**: what was written, which file, the commit.
 3. **Invoke the advisor** (Agent tool, `subagent_type: advisor`) automatically

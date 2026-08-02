@@ -15,12 +15,13 @@ Build a 5–10 question set (fewer on request), drawn in this priority order:
 
 1. **Open entries in `notes/_understanding-log.md`** — re-tests first. Include
    any entry whose `trigger` matches the current context (e.g. the user is
-   deploying the thing named in a point-of-use trigger).
+   deploying the thing named in a point-of-use trigger). ⚠ **Also sweep for triggers that
+   already fired** — a point-of-use row whose moment has passed is overdue, not future.
 2. **Scoped topic** — read that topic's section of `INDEX.md` (grep the
    section, don't read the whole file) and pick notes across ages: some recent,
    some old.
 3. **No scope** — mix: 2–3 log re-tests (if any), then sample from INDEX
-   weighted toward (a) notes related to the currently active project in
+   weighted toward (a) notes serving the goal named in `## Recommended next` of
    `learning-path.md` and (b) older notes that likely faded.
 
 Read a note's full content **only** for the notes you actually quiz on.
