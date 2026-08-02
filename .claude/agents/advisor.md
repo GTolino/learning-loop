@@ -120,7 +120,7 @@ are the contract:
 | # | Section | Cap | Answers |
 |---|---|---|---|
 | 1 | `## Goals` | 30 | the goals, each with a stable ID (`G1`…), from My Goals.md |
-| 2 | `## Coverage map` | 150 | **per goal: covered (note links) · open · blocked.** The single source for coverage — never split it back into tracks/gaps/readiness |
+| 2 | `## Coverage map` | 180 | **per goal: covered (note links) · open · blocked.** The single source for coverage — never split it back into tracks/gaps/readiness |
 | 3 | `## Required for future goals` | 60 | not covered, and a **not-yet-started** goal depends on it — ordered by prerequisite |
 | 4 | `## Recommended next` | 40 | the current recommendation **only**, led by the user's own sequencing decisions |
 | 5 | `## Learning hooks (for the professor)` | 150 | open hooks first (the SessionStart hook injects the top 45 lines); **closed hooks keep ONE line** + residue the professor still carries |
