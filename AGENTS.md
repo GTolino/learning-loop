@@ -27,20 +27,32 @@ clearly, use real analogies, and always connect theory to something I can build.
   the lesson. I'll say "just do it" if I want you to take over.
 - **Building agents/skills/infra = you execute, I approve.** For plumbing where the
   doing is *not* the lesson, draft it yourself, show me, let me approve.
-- **Comprehension check before logging a note.** When I want to capture a concept,
-  run a short active-recall quiz first (mixed Recall / Application / Edge questions)
-  to confirm it landed — only then write the note. I can bypass with "skip the
-  check" / "just log it". Shaky (🟡/❌) answers get logged to the vault's
-  `_understanding-log.md` for a later re-test — never discarded.
+- **The comprehension check gates a note's STATUS, never its existence.** When I want
+  to capture a concept, run a short active-recall quiz first (mixed Recall /
+  Application / Edge questions). I can bypass with "skip the check" / "just log it".
+  **The note gets written either way** — the concept I answered wrong is precisely
+  the one I need something to read. Passed → `status: stable`. Shaky (🟡/❌) →
+  `status: wip`, and that note must state **the misconception, why it's wrong, and
+  what would settle it** — written as a wrong model anyone could hold, **never as a
+  record of who said what, or when**. Understanding is demonstrated by **reading real
+  output correctly**, not only by predicting it in advance. Either way the wobble gets
+  a row in `_understanding-log.md` — the review queue's input, never discarded.
+  ⚠ **A log row must never point at a note that doesn't contain the concept.**
 - **Point-of-use review for ops/procedural topics.** Don't quiz right after a
-  procedure — log the deferred review in `_understanding-log.md` with a trigger
-  (e.g. `when deploying X`) so it resurfaces at exactly the right moment.
+  procedure. **Deferring the quiz never defers the note:** capture it as
+  `status: reference` — a runbook I can follow again unaided (exact commands, why each
+  step exists, what breaks if it's skipped) — and log the deferred review with a
+  trigger (e.g. `when deploying X`) so it resurfaces at the right moment.
 - **Retention is a loop, not a capture.** Review is pull-based active recall
   ("quiz me"), ideally when the review queue shows debt. An end-of-session
-  **harvest** ("harvest this session") sweeps what was covered: landed → capture,
-  half-landed → log, procedural → point-of-use trigger.
+  **harvest** ("harvest this session") sweeps what was covered: landed → `stable`,
+  half-landed → `wip` + log row, procedural → `reference` + point-of-use trigger.
+  Status and review timing are the only variables — the **capture filter is goal
+  relevance, never comprehension.** A concept I got wrong still gets its note; a
+  passing mention that serves no goal and I'd never re-read gets none.
 - **Answer style.** Short answer first, depth on request. One question at a time.
-  Build on what my notes already show I know — **check them first**, never re-teach.
+  **Grep `INDEX.md` before explaining any concept** — a hit means read the note and
+  build on it, and "explain X *again*" is a signal to **test**, not to re-explain.
   Never make me feel behind; celebrate milestones.
 - **Destructive ops — look before you leap.** Before any delete or overwrite,
   inspect the target and confirm it's disposable. Back up before bulk edits.
@@ -80,10 +92,19 @@ durable concept with a source link back.
   `[[wikilinks]]` resolve. Dense topics get a **Map-of-Content hub** note linking
   its concept children. Topic folders can grow: when a concept fits none, the
   scribe creates a new topic folder (deliberately, announced).
+- **Notes are study material, not a transcript.** A note exists so I can **re-learn
+  the concept from it** months later — not to prove the topic was covered. Every note
+  carries: the **mechanism** explained from the ground up · a **worked example with
+  real numbers or commands from my own machine** · the **misconception it corrects,
+  named explicitly** · and **what I can run to prove it myself**. If a note can't
+  re-teach me the concept, it isn't finished. Prefer the sharp falsifying example
+  over a complete survey.
 - **Frontmatter schema (every note):** `title · topic · tags · created · summary ·
   related · status`. `summary` is the one-line retrieval payload. `tags` come
-  **only** from the controlled registry in `notes/_tags.md`. `status`: stable /
-  wip / reference / project.
+  **only** from the controlled registry in `notes/_tags.md`.
+  `status`: **stable** (comprehension verified) · **wip** (written, not yet verified —
+  carries the open question and the misconception) · **reference** (procedure/runbook,
+  review deferred to point of use) · **project** · **complete**.
 - **`INDEX.md`** = generated map of all notes by topic + a **Gaps** section
   (concepts linked but never written). Regenerated automatically by a hook.
 - **Retention layer:** `_understanding-log.md` files — one at the vault root and

@@ -37,9 +37,18 @@ are enough.
 Open entries = review debt. Factor it into recommendations (a long open list
 beats starting a new topic).
 
-### Current plan — `notes/learning-path.md`
-Read the full current state before making any changes. Never overwrite existing
-progress — only update and expand.
+### Current plan — `notes/learning-path.md` — read it by SECTION, never whole
+This file is read on every capture; reading it whole becomes the single largest
+context cost in the system as it grows. Get the map first, then open only what
+you'll change:
+```bash
+grep -n '^## ' notes/learning-path.md      # section map + line numbers
+```
+Then `Read` with `offset`/`limit` for those sections only. A routine
+note-capture update touches `## Tracks`, `## Session log` and
+`## Recommended next` — it does not need the other seven. Never overwrite
+existing progress — only update and expand. **Never read
+`learning-path-archive.md`** unless the user asks about history.
 
 ## How to build and maintain learning-path.md
 
@@ -103,18 +112,33 @@ lands (INDEX is the proof). When the `new-course` skill reports a new course,
 add its row and connect it to goals.
 
 ## learning-path.md structure
-Keep it an index, not a textbook. Sections, in order:
-1. `## Goals summary` — derived from My Goals.md
-2. `## Current focus & sequencing` — the active lane(s), set by the user
-3. `## Recommended next` — options presented; the user leads
-4. `## Tracks` — per-track concept checklists; checked only if a note exists
-5. `## Courses` — course rows + promotion candidates
-6. `## Readiness summary` — table per track
-7. `## Gaps — to-cover` — genuine never-written gaps
-8. `## Learning hooks (for the professor)`
-9. `## Session log` — newest first; keep the last ~5, archive the rest to
-   `learning-path-archive.md`
-10. `## Certifications and courses` — surfaced options with sources
+Keep it an index, not a textbook. Section headings are **load-bearing** — the
+SessionStart hook and the `review` skill `awk`/`grep` on them. Never rename one.
+The caps are the contract:
+
+| # | Section | Cap | Content |
+|---|---|---|---|
+| 1 | `## Goals summary` | 40 | derived from My Goals.md |
+| 2 | `## Current focus & sequencing` | 60 | the active lane(s), set by the user |
+| 3 | `## Recommended next` | 60 | options presented; the user leads |
+| 4 | `## Tracks` | 80 | per-track checklists; checked only if a note exists |
+| 5 | `## Courses` | 30 | course rows + promotion candidates |
+| 6 | `## Readiness summary` | 30 | table per track |
+| 7 | `## Gaps — to-cover` | 60 | genuine never-written gaps |
+| 8 | `## Learning hooks (for the professor)` | 150 | open hooks first (the SessionStart hook injects the top 45 lines); **closed hooks keep ONE line** + any residue the professor must still carry |
+| 9 | `## Session log` | 100 | newest first, last ~5 sessions, **≤20 lines each** |
+| 10 | `## Certifications and courses` | 20 | surfaced options with sources |
+
+**Enforce the caps on every write** — a section over cap is not a full section,
+it is an unpruned one. Prune by **moving** the excess to
+`learning-path-archive.md` (append, dated); the archive is the history, so
+nothing is ever lost and nothing stale stays loaded. **Any section you find over
+cap, bring it down the next time you write it.**
+
+**Register: state, not narration.** This file records *where the user stands and
+what comes next* — not what was said getting there. No quoted dialogue, no
+scoring who predicted what. A row earns its place by changing a decision.
+Same rule the notes follow: content, not transcript.
 
 ## Prerequisites logic
 Never recommend a concept whose prerequisites are not yet covered. When in

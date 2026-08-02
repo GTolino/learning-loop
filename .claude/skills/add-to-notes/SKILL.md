@@ -11,18 +11,22 @@ mid-explanation. The user decides when something is ready.
 
 ## Steps
 
-0. **Comprehension check FIRST (gate before scribe).** Run a short active-recall
-   quiz (3–5 questions, mixed Recall / Application / Edge types) to confirm the
-   concept fully landed. Assess the answers, clear up any gaps, and only proceed
-   to the scribe once understanding is confirmed.
-   **Bypass:** skip if the user says so ("skip the check", "just log it").
-   **Log what wobbled:** any 🟡/❌ answer — even one cleared up on the spot —
-   gets a row in `notes/_understanding-log.md` → Open gaps
-   (`trigger: next review`) so "quiz me" re-tests it later. Shaky answers are
-   the review queue's input; don't discard them.
-   **Point-of-use deferral (ops/procedural concepts):** don't force a quiz right
-   after a procedure — if the user defers ("defer the check"), log a row with
-   the point-of-use trigger (e.g. `when deploying X`) and proceed to the scribe.
+0. **Comprehension check FIRST — it sets the note's `status`, it never gates the
+   note** (full policy in `AGENTS.md`). Run 3–5 active-recall questions (Recall /
+   Application / Edge), grade them, clear up gaps — then go to the scribe **either
+   way**. A failed check means the user needs the note *more*, not less.
+   - **Passed** → `status: stable`.
+   - **Shaky (🟡/❌), or bypassed** ("skip the check" / "just log it") →
+     `status: wip`, and give the scribe **the misconception stated impersonally**
+     — the wrong model and what would settle it, never who answered what.
+   - **Ops/procedural with the review deferred** → `status: reference`: a runbook
+     the user can follow unaided (exact commands, why each step, what breaks if
+     skipped). Don't force a quiz right after a procedure.
+   - **Log every 🟡/❌**, even one cleared up on the spot, as a row in
+     `notes/_understanding-log.md` → Open gaps — `trigger: next review` (or the
+     point-of-use moment, e.g. `when deploying X`), `related note` pointing at the
+     note just written. ⚠ **A row must never point at a note that doesn't contain
+     the concept** — that is the failure this step prevents.
 
 1. **Invoke the scribe subagent** (Agent tool, `subagent_type: scribe`).
    Do **not** summarize the concept first — pass the raw context:

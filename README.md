@@ -3,16 +3,16 @@
 **A learning OS for Claude Code — an agentic second brain that forces retention, not just capture.**
 
 Most AI-assisted learning setups are great at *capturing* knowledge and terrible at
-making it stick. This template closes the loop: every concept you learn is
-quiz-gated before it's saved, indexed for retrieval, tracked on a roadmap, re-tested
-until it holds, and — when it comes from an outside course — promoted into your
-permanent vault. The parts humans forget are enforced by deterministic hooks, not
+making it stick. This template closes the loop: every concept you learn is written as
+study material you can re-learn from, quizzed to set how much you trust it, indexed for
+retrieval, tracked on a roadmap, re-tested until it holds, and — when it comes from an
+outside course — promoted into your permanent vault. The parts humans forget are enforced by deterministic hooks, not
 willpower.
 
 ```
  TEACH      the professor explains, you drive the keyboard
    ↓
- CAPTURE    "add to my notes" → comprehension quiz → atomic note in the vault
+ CAPTURE    "add to my notes" → quiz sets the status → atomic note in the vault
    ↓
  INDEX      hook auto-regenerates INDEX.md on every note write
    ↓
@@ -31,11 +31,17 @@ willpower.
   captured as concept notes. Implemented-but-unwritten knowledge is invisible to your
   future self. The advisor audits for this; the harvest ritual enforces it session by
   session.
-- **Comprehension gates.** Nothing enters the vault without a short active-recall
-  quiz (Recall / Application / Edge questions). Shaky answers aren't discarded — they
-  become the review queue.
-- **Point-of-use review.** For ops/procedural topics, the quiz is deferred to the
-  moment you next *deploy* the thing — logged with a trigger so it actually resurfaces.
+- **The quiz sets a note's status, never whether it exists.** A short active-recall
+  quiz (Recall / Application / Edge) marks the note `stable` or `wip` — but the note is
+  written either way, because the concept you got wrong is the one you most need
+  something to read. Shaky answers become the review queue.
+- **Notes are study material, not a transcript.** Every note carries the mechanism from
+  the ground up, a worked example with real output from your own machine, the
+  misconception it corrects, and what you can run to prove it. If a note can't re-teach
+  you the concept months later, it isn't finished.
+- **Point-of-use review.** For ops/procedural topics the quiz is deferred to the moment
+  you next *deploy* the thing — logged with a trigger so it actually resurfaces. The
+  note is still written now, as a runbook you can follow unaided.
 - **Atomic vault, metadata-first.** One concept per file, filename = concept name,
   one-line `summary` in frontmatter as the retrieval payload. Agents scan the
   generated `INDEX.md`, not 300 notes. Plain Markdown, Obsidian-compatible, no
@@ -59,7 +65,7 @@ willpower.
 | You say | Where | What happens |
 |---|---|---|
 | "set up my learning environment" | root | one-time bootstrap interview |
-| "add to my notes" | root | quiz gate → scribe writes the atomic note → advisor updates the roadmap |
+| "add to my notes" | root | quiz sets the status → scribe writes the atomic note → advisor updates the roadmap |
 | "quiz me (on X)" | root | retention quiz over your vault; misses → understanding log |
 | "harvest this session" / "wrap up" | root | end-of-session sweep — capture, log, or defer everything covered |
 | "enrich my notes" / "fill my gaps" | anywhere | enricher fact-checks, fills logged gaps, adds vetted resources |

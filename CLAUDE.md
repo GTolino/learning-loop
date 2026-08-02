@@ -22,9 +22,9 @@ else in the workspace.
 ## Session start (learning sessions)
 The **SessionStart hook** injects the learning dashboard automatically:
 recommended next, open learning hooks, and the review queues. Beyond that, read
-`notes/My Goals.md` when goals context matters, and **grep `notes/INDEX.md` for
-the relevant topic section** — never read it whole once it grows. Open only the
-notes you need. Never re-teach what a note already covers.
+`notes/My Goals.md` when goals context matters. **Always grep `notes/INDEX.md`
+for the relevant topic section, never read it whole** once it grows — then open
+only the notes you need.
 
 ## Magic words → skills
 
