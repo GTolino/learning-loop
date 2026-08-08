@@ -63,9 +63,11 @@ only the notes you need.
   their own `.claude/settings.json` (from `.claude/templates/course-settings.json`),
   because settings load from the folder Claude Code is launched in and the repo
   root's never apply there — a spoke without that file gets no hook at all, silently.
-- **PostToolUse** on Write|Edit (`regen-index.sh`) — auto-regenerates
-  `notes/INDEX.md` whenever a vault note is written, and surfaces anything the
-  generator reports about the note just written (missing summary or status).
+- **PostToolUse** on Write|Edit (`regen-index.sh`) — auto-regenerates **both**
+  generated maps, `notes/INDEX.md` and `notes/_coverage.md`, whenever a vault note
+  is written, and surfaces anything the generator reports about the note just
+  written (missing summary or status). One run, one frontmatter walk, two
+  projections — so there is no path where one is fresh and the other stale.
   Manual fallback: `python3 generate_index.py` from `notes/`.
 - **PostToolUse** on Write|Edit (`state-file-review.sh`) — section-size review for
   `notes/learning-path.md`, the one state file still grown by hand (thresholds shared

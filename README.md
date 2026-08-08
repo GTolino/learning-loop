@@ -14,7 +14,7 @@ willpower.
    ↓
  CAPTURE    "add to my notes" → quiz sets the status → atomic note in the vault
    ↓
- INDEX      hook auto-regenerates INDEX.md on every note write
+ INDEX      hook auto-regenerates INDEX.md + _coverage.md on every note write
    ↓
  PLAN       the advisor keeps learning-path.md — your roadmap — in sync
    ↓
@@ -64,6 +64,11 @@ willpower.
   needs, and clipped only when `INDEX.md` emits the map. Agents scan the generated
   index, not 300 notes, then open the one note that matters. Plain Markdown, Obsidian-compatible, no
   lock-in — a local model can read it offline.
+- **Two projections, one walk.** The same frontmatter scan emits `INDEX.md` (with
+  summaries, for *which note do I want*) and `_coverage.md` (without them, for *does a
+  note exist at all*). Coverage is a set-difference question, so the advisor enumerates
+  the complete roster rather than retrieving a similar-looking subset — a sample can
+  never prove a note is missing. Dropping the summaries makes reading all of it cheap.
 - **Deterministic where it matters.** Session-start context injection and index
   regeneration are shell hooks, not prose instructions the model might skip.
 
@@ -104,7 +109,8 @@ CLAUDE.md                  Claude Code wiring — spokes, skills, agents, hooks
   hooks/                   learning-dashboard.sh (SessionStart) · regen-index.sh (auto-INDEX)
                            state-file-review.sh + thresholds.sh (roadmap size review)
   templates/               Course Tutor file + spoke settings (copied into each course folder)
-notes/                     your vault — atomic notes, generated INDEX.md, learning-path.md
+notes/                     your vault — atomic notes, generated INDEX.md + _coverage.md,
+                           learning-path.md
 ```
 
 ## Portability

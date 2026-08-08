@@ -50,13 +50,19 @@ mid-explanation. The user decides when something is ready.
    note and the note is `stable`.
 4. **Invoke the course advisor ONCE — after the LAST note of this session's
    capture, never after each one.** Capture typically happens at session end and
-   often covers several concepts; the advisor re-reads goals, `INDEX.md` and the
-   plan and then rewrites it, so running it per note repeats that whole cycle for
-   one session's worth of change.
+   often covers several concepts; the advisor re-reads the plan and rewrites it,
+   so running it per note repeats that whole cycle for one session's worth of
+   change.
    - More concepts still to capture → **scribe them all first**, then one advisor
      run covering the batch.
-   - Last (or only) concept → invoke `subagent_type: advisor` now, brief it with
+   - Last (or only) concept → invoke `subagent_type: advisor` now, and say in the
+     brief that this is a **routine update**. That is the word that keeps it off
+     the whole-vault read: it diffs from its own last `plan:` commit, reads the
+     notes that changed, and greps `_coverage.md` for the rest. Brief it with
      **every** concept captured this session, and relay its "recommended next".
+   - ⚠ The scribe must have **committed** before the advisor runs — its delta is a
+     git diff. The scribe commits as its own last step, so this holds by default;
+     don't invoke the advisor between writing and committing.
    - ⚠ **Skip entirely when running under `harvest`** — harvest owns the single
      advisor run in its own final step.
    - Already ran the advisor this session and nothing was scribed since? Don't

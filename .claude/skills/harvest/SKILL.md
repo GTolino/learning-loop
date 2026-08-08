@@ -60,7 +60,13 @@ not a new work phase.
 
 5. **Invoke the course advisor ONCE** (Agent tool, `subagent_type: advisor`) if
    anything was scribed — with every concept captured this session and the hook
-   status from step 4 in a single brief. Relay its "recommended next".
+   status from step 4 in a single brief. Say it is a **routine update**, which is
+   what keeps it reading the session's delta instead of the whole vault. Relay its
+   "recommended next".
+   - Harvest is also the natural place to ask for a **full review** instead — say
+     so explicitly when coverage itself is the question (a project just shipped, a
+     goal moved, gaps need dispositions). That mode is far more expensive; ask for
+     it deliberately, not by default.
 
 ## Rules
 

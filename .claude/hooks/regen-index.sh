@@ -1,5 +1,6 @@
 #!/bin/bash
-# PostToolUse hook (Write|Edit): regenerate INDEX.md when a hub vault note changes.
+# PostToolUse hook (Write|Edit): regenerate INDEX.md + _coverage.md when a hub
+# vault note changes. One generate_index.py run emits both, from one walk.
 # Reads the hook JSON on stdin, extracts tool_input.file_path, and reruns
 # generate_index.py only for .md files inside a hub topic folder. Spokes
 # (folders with their own CLAUDE.md), underscore/hidden folders, and
@@ -32,6 +33,6 @@ MINE=$(printf '%s\n' "$ERR" | grep -F "$topic/$base:")
 [ -z "$MINE" ] && exit 0
 
 cat <<EOF
-{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"📇 INDEX regenerated — problem with the note just written:\n$(printf '%s' "$MINE" | python3 -c 'import sys,json;print(json.dumps(sys.stdin.read())[1:-1])')\nFix it in the frontmatter now; INDEX is generated, so editing it directly does nothing."}}
+{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"📇 INDEX + _coverage regenerated — problem with the note just written:\n$(printf '%s' "$MINE" | python3 -c 'import sys,json;print(json.dumps(sys.stdin.read())[1:-1])')\nFix it in the frontmatter now; INDEX is generated, so editing it directly does nothing."}}
 EOF
 exit 0

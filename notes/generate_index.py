@@ -1,5 +1,19 @@
 #!/usr/bin/env python3
-"""Regenerate INDEX.md for the hub vault from note frontmatter.
+"""Regenerate INDEX.md and _coverage.md for the hub vault from note frontmatter.
+
+TWO PROJECTIONS OF ONE WALK. Both files are written from the same collect()
+pass, so they cannot drift:
+
+  INDEX.md      the SCANNING map — title + status + clipped summary, by topic,
+                plus the review queue and gaps. What you read to decide which
+                note is relevant. ~93 KB; every consumer but one reads it by
+                grep or by section, so its size is not a cost to them.
+  _coverage.md  the COVERAGE manifest — the same notes with NO summaries. One
+                line per note: status, topic, filename. ~4x smaller. Exists for
+                the advisor, the only agent that must read the whole vault
+                roster at once to answer "does a note exist for X" and "what is
+                a goal missing". Absence questions need the complete set, so it
+                is enumerated, never sampled.
 
 Scans the hub topic folders, parses each note's YAML frontmatter, and emits a
 rolled-up map grouped by topic (Map-of-Content hubs first, then the rest), plus
@@ -34,6 +48,7 @@ from pathlib import Path
 
 VAULT = Path(__file__).resolve().parent
 INDEX = VAULT / "INDEX.md"
+COVERAGE = VAULT / "_coverage.md"
 
 # Optional display order for topics; any topic folder not listed here is
 # appended alphabetically. Fine to leave empty.
@@ -134,6 +149,25 @@ class Note:
         summary = clip(self.summary) if self.summary else "_(no summary)_"
         return f"- {marker}[[{self.stem}|{self.title}]] · `{self.status}` — {summary}"
 
+    def manifest_line(self) -> str:
+        """One coverage line: no summary, no wikilink.
+
+        Plain text rather than `[[stem]]` on purpose — INDEX.md already backlinks
+        every note, and a second linking file would double the backlink noise in
+        every note's Obsidian panel. The reader wraps the name in brackets when it
+        writes a plan entry. `title:` is emitted only when it differs from the
+        filename (filesystem-illegal characters get stripped, e.g. `/24 Subnet`
+        becomes `24 Subnet`), so the concept name is never lost but costs nothing
+        for the majority of notes where the two agree.
+        """
+        marker = "🗺 " if self.is_hub else ""
+        line = f"{self.status} | {self.topic} | {marker}{self.stem}"
+        if self.title != self.stem:
+            line += f" | title: {self.title}"
+        if self.review:
+            line += f" | ⏳ {self.review}"
+        return line
+
 
 def collect() -> tuple[dict[str, list[Note]], set[str], list[str], list[Path]]:
     topics: dict[str, list[Note]] = {}
@@ -171,6 +205,85 @@ def collect() -> tuple[dict[str, list[Note]], set[str], list[str], list[Path]]:
     return topics, known, link_targets, skipped
 
 
+def compute_gaps(known, link_targets) -> dict[str, int]:
+    """Linked but never written, resolved against stems + aliases. Shared by both
+    projections so the gap list can never say two different things."""
+    gaps: dict[str, int] = {}
+    for t in link_targets:
+        if t not in known:
+            gaps[t] = gaps.get(t, 0) + 1
+    return gaps
+
+
+def status_roll(topics) -> tuple[dict[str, int], str]:
+    counts: dict[str, int] = {}
+    for v in topics.values():
+        for n in v:
+            counts[n.status] = counts.get(n.status, 0) + 1
+    roll = " · ".join(f"{c} {s}" for s, c in sorted(counts.items(), key=lambda kv: -kv[1]))
+    return counts, roll
+
+
+def build_coverage(topics, known, link_targets) -> str:
+    """The advisor's manifest: every note, no summaries.
+
+    Answers coverage questions — does a note exist for concept X, what is its
+    status, what does a goal still lack — which are membership and set-difference
+    questions over the COMPLETE roster. That is why this enumerates rather than
+    retrieves: a sampled subset can never prove a note is absent.
+    """
+    ordered = TOPIC_ORDER + sorted(t for t in topics if t not in TOPIC_ORDER)
+    total = sum(len(v) for v in topics.values())
+    hubs = sum(1 for v in topics.values() for n in v if n.is_hub)
+    _, roll = status_roll(topics)
+
+    out: list[str] = []
+    out.append("# _coverage — advisor manifest (generated)\n")
+    out.append(
+        "> Written by `generate_index.py` from the same frontmatter walk as "
+        "`INDEX.md`,\n> so the two cannot drift. **Never edit by hand.**\n>\n"
+        "> This is the summary-free projection, for **coverage** questions only: "
+        "does a\n> note exist for concept X · what is its status · what is a goal "
+        "still missing.\n> For what a note SAYS, read the note. For a scannable map "
+        "with summaries, read\n> `INDEX.md`. Names are plain text — wrap them in "
+        "`[[ ]]` when writing the plan.\n>\n"
+        "> The review queue is not duplicated here: `status: wip` is due now, `⏳` "
+        "marks a\n> deferred trigger. Grep for either.\n"
+    )
+    out.append(f"**{total} notes** · {len(topics)} topics · {hubs} 🗺 hubs\n")
+    out.append(f"**Status:** {roll}.\n")
+
+    out.append("## Notes\n")
+    out.append("`status | topic | filename` — plus `| title:` when the concept "
+               "name differs from the filename, and `| ⏳` for a review trigger.\n")
+    out.append("```")
+    for topic in ordered:
+        notes = topics.get(topic)
+        if not notes:
+            continue
+        notes.sort(key=lambda n: (not n.is_hub, sort_key(n.title)))
+        out.extend(n.manifest_line() for n in notes)
+    out.append("```\n")
+
+    gaps = compute_gaps(known, link_targets)
+    out.append(f"## Gaps — linked but never written ({len(gaps)})\n")
+    out.append(
+        "Concepts referenced in `[[wikilinks]]` with no matching note or alias. "
+        "Each\nowes a disposition — write the note, or fix the link that points "
+        "at it.\n"
+    )
+    if gaps:
+        out.append("```")
+        for tgt, n in sorted(gaps.items(), key=lambda kv: (-kv[1], kv[0])):
+            out.append(f"{tgt}{f'  — {n}×' if n > 1 else ''}")
+        out.append("```")
+    else:
+        out.append("_None — every wikilink resolves._")
+    out.append("")
+
+    return "\n".join(out) + "\n"
+
+
 def build(topics, known, link_targets) -> str:
     ordered = TOPIC_ORDER + sorted(t for t in topics if t not in TOPIC_ORDER)
     total = sum(len(v) for v in topics.values())
@@ -183,11 +296,7 @@ def build(topics, known, link_targets) -> str:
         "retrieval\n> and coverage review. Regenerate with `generate_index.py` "
         "after adding notes.\n"
     )
-    counts: dict[str, int] = {}
-    for v in topics.values():
-        for n in v:
-            counts[n.status] = counts.get(n.status, 0) + 1
-    roll = " · ".join(f"{c} {s}" for s, c in sorted(counts.items(), key=lambda kv: -kv[1]))
+    _, roll = status_roll(topics)
     out.append(
         f"**{total} hub notes** across {len(topics)} topics. "
         f"{hubs} Map-of-Content hubs.\n"
@@ -247,10 +356,7 @@ def build(topics, known, link_targets) -> str:
         out.append("")
 
     # Gaps: linked but never written. Resolved against stems + aliases.
-    gaps: dict[str, int] = {}
-    for t in link_targets:
-        if t not in known:
-            gaps[t] = gaps.get(t, 0) + 1
+    gaps = compute_gaps(known, link_targets)
     out.append("## ⚠ Gaps — linked but not written\n")
     out.append(
         "> Concepts referenced in `[[wikilinks]]` with no matching note or "
@@ -274,11 +380,14 @@ def main() -> int:
     if not topics:
         print("No topic folders found — run from the vault root.", file=sys.stderr)
         return 1
+    # Both projections from the same walk, in the same run — there is no path
+    # where one is refreshed and the other is left stale.
     INDEX.write_text(build(topics, known, link_targets), encoding="utf-8")
+    COVERAGE.write_text(build_coverage(topics, known, link_targets), encoding="utf-8")
 
     total = sum(len(v) for v in topics.values())
     hubs = sum(1 for v in topics.values() for n in v if n.is_hub)
-    print(f"INDEX.md written: {total} notes, {hubs} hubs, "
+    print(f"INDEX.md + _coverage.md written: {total} notes, {hubs} hubs, "
           f"{len(topics)} topics.", file=sys.stderr)
     # Per-note problems, reported with the path so a caller can filter to the file
     # it just wrote. These used to be swallowed by the hook's 2>/dev/null — which is

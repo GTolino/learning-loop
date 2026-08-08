@@ -131,9 +131,16 @@ durable concept with a source link back.
   **complete**.
   `review`: a point-of-use moment (`review: when deploying X`), independent of status.
   Absent = nothing deferred.
-- **`INDEX.md`** = generated map of all notes by topic (each with its `status`), plus
-  the generated **Review queue** and a **Gaps** section (concepts linked but never
-  written). Regenerated automatically by a hook — never edit it by hand.
+- **Two generated maps, one walk.** Both regenerate on every note write from the same
+  frontmatter scan, so they cannot disagree — **never edit either by hand.**
+  - **`INDEX.md`** = the *scanning* map: all notes by topic with `status` + a clipped
+    summary, plus the generated **Review queue** and **Gaps** (concepts linked but never
+    written). Read a topic section to decide which note is relevant.
+  - **`_coverage.md`** = the same roster with **no summaries** — one line per note
+    (`status | topic | filename`) + the gap list, several times smaller. For *coverage*
+    questions: does a note exist, what is its status, what is a goal missing. Those are
+    absence questions, so this file is read **whole** — a sample can't prove a note
+    isn't there.
 - **Retention layer: the note carries its own review state.** `status` says whether the
   concept is verified; `review` defers it to a moment. The **review queue is generated**
   into `INDEX.md` from those two fields — nothing is maintained by hand, so a queue entry
